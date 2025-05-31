@@ -1,6 +1,6 @@
 let productsHTML = '';
 
-for(let i=0 ; i<products.length ; i++){
+for(let i=0 ; i< products.length ; i++){
     productsHTML += `
         <div class="product-container">
           <div class="product-image-container">
@@ -46,10 +46,37 @@ for(let i=0 ; i<products.length ; i++){
             Added
           </div>
 
-          <button class="add-to-cart-button button-primary">
+          <button class="add-to-cart-button button-primary
+                          js-add-to-cart"
+                          data-product-id = "${products[i].id}">
             Add to Cart
           </button>
         </div>
     `
     document.querySelector('.js-products-grid').innerHTML = productsHTML;
+
+    //here buttons is a array not just a variable
+    let buttons = document.querySelectorAll('.js-add-to-cart');
+    for (let i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener('click', function () {
+            const productId = buttons[i].dataset.productId;
+
+            let MatchingItem = null;
+            for(let i=0 ; i<cart.length ; i++){
+              if(cart[i].productId == productId){
+                MatchingItem = cart[i];
+              }
+            }
+            if(MatchingItem !== null)
+                MatchingItem.quantity += 1;
+            else{
+                cart.push({
+                  productId : productId,
+                  quantity : 1
+                });
+              }
+            console.log(cart);
+        });
+    }
+
 }
