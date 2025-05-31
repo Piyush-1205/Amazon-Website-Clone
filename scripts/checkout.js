@@ -1,15 +1,16 @@
 import {cart} from '../data/cart.js';
 import {products} from '../data/products.js';
+import {formatCurrency} from './utils/money.js';
 
 let cartSummaryHTML = '';
 
 cart.forEach((cartItem) => {
     const productId = cartItem.productId;
 
-    let MatchingProduct;
+    let matchingProduct = null;
     products.forEach((product) => {
         if(productId === product.id)
-            MatchingProduct = product;
+            matchingProduct = product;
     });
 
     cartSummaryHTML += `
@@ -20,14 +21,14 @@ cart.forEach((cartItem) => {
 
         <div class="cart-item-details-grid">
             <img class="product-image"
-            src="${MatchingProduct.image}">
+            src="${matchingProduct.image}">
 
             <div class="cart-item-details">
             <div class="product-name">
-                ${MatchingProduct.name}
+                ${matchingProduct.name}
             </div>
             <div class="product-price">
-                $${(MatchingProduct.priceCents/100).toFixed(2)}
+                $${formatCurrency(matchingProduct.priceCents)}
             </div>
             <div class="product-quantity">
                 <span>
@@ -91,4 +92,5 @@ cart.forEach((cartItem) => {
     `;
 });
 
+console.log(cartSummaryHTML);
 document.querySelector('.js-order-summary').innerHTML = cartSummaryHTML;
