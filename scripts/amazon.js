@@ -75,7 +75,15 @@ for(let i=0 ; i< products.length ; i++){
                   quantity : 1
                 });
               }
-            console.log(cart);
+            
+            let cartQuantity = 0;
+            for(let i=0 ; i<cart.length ; i++){
+                cartQuantity += cart[i].quantity;
+            }  
+
+            document.querySelector('.js-cart-quantity').innerHTML = cartQuantity;
+            // console.log(cartQuantity);
+            // console.log(cart);
         });
     }
 
