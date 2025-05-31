@@ -1,4 +1,5 @@
-import {cart} from '../data/cart.js';
+import {cart, addToCart} from '../data/cart.js';
+import {products} from '../data/products.js';
 
 let productsHTML = '';
 
@@ -57,35 +58,21 @@ for(let i=0 ; i< products.length ; i++){
     `
     document.querySelector('.js-products-grid').innerHTML = productsHTML;
 
+    function updateCartQuantity(){
+      let cartQuantity = 0;
+        for(let i=0 ; i<cart.length ; i++){
+            cartQuantity += cart[i].quantity;
+        }  
+        document.querySelector('.js-cart-quantity').innerHTML = cartQuantity;
+    }
+
     //here buttons is a array not just a variable
     let buttons = document.querySelectorAll('.js-add-to-cart');
     for (let i = 0; i < buttons.length; i++) {
         buttons[i].addEventListener('click', function () {
             const productId = buttons[i].dataset.productId;
-
-            let MatchingItem = null;
-            for(let i=0 ; i<cart.length ; i++){
-              if(cart[i].productId == productId){
-                MatchingItem = cart[i];
-              }
-            }
-            if(MatchingItem !== null)
-                MatchingItem.quantity += 1;
-            else{
-                cart.push({
-                  productId : productId,
-                  quantity : 1
-                });
-              }
-            
-            let cartQuantity = 0;
-            for(let i=0 ; i<cart.length ; i++){
-                cartQuantity += cart[i].quantity;
-            }  
-
-            document.querySelector('.js-cart-quantity').innerHTML = cartQuantity;
-            // console.log(cartQuantity);
-            // console.log(cart);
+            addToCart(productId);
+            updateCartQuantity();
         });
     }
 
