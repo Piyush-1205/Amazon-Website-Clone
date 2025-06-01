@@ -1,4 +1,4 @@
-import {cart} from '../data/cart.js';
+import {cart, saveToStorage} from '../data/cart.js';
 import {products} from '../data/products.js';
 import {formatCurrency} from './utils/money.js';
 
@@ -118,6 +118,7 @@ function deleteFromCart(productId){
     }
     cart.splice(matchingProductIndex, 1);
     // Update localStorage after deletion
+    saveToStorage();
     localStorage.setItem('cart', JSON.stringify(cart));
 
 }

@@ -1,5 +1,9 @@
 export const cart = JSON.parse(localStorage.getItem('cart')) || [];
 
+export function saveToStorage(){
+    localStorage.setItem('cart', JSON.stringify(cart));
+}
+
 export function addToCart(productId){
   let MatchingItem = null;
   for(let i=0 ; i<cart.length ; i++){
@@ -19,5 +23,6 @@ export function addToCart(productId){
   }
 
   // Save cart to localStorage
-  localStorage.setItem('cart', JSON.stringify(cart));
+  saveToStorage();
+//   localStorage.setItem('cart', JSON.stringify(cart));
 }
