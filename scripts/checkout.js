@@ -1,126 +1,152 @@
-import {cart, saveToStorage} from '../data/cart.js';
-import {products} from '../data/products.js';
-import {formatCurrency} from './utils/money.js';
+import { cart, saveToStorage, updateDeliveryOption } from '../data/cart.js';
+import { products } from '../data/products.js';
+import { formatCurrency } from './utils/money.js';
+import dayjs from 'https://unpkg.com/supersimpledev@8.5.0/dayjs/esm/index.js';
+import { deliveryOptions } from '../data/deliveryOptions.js';
 
-function generateHTML(){
+function generateHTML() {
     let cartSummaryHTML = '';
+
     cart.forEach((cartItem) => {
         const productId = cartItem.productId;
 
         let matchingProduct = null;
-        products.forEach((product) => {
-            if(productId === product.id)
-                matchingProduct = product;
-        });
+        for (let i = 0; i < products.length; i++) {
+            if (productId === products[i].id) {
+                matchingProduct = products[i];
+            }
+        }
+
+        let selectedOption = null;
+        for (let i = 0; i < deliveryOptions.length; i++) {
+            if (deliveryOptions[i].id === cartItem.deliveryOptionId) {
+                selectedOption = deliveryOptions[i];
+            }
+        }
+
+        if (selectedOption === null) {
+            selectedOption = deliveryOptions[0];
+        }
+
+        let today = dayjs();
+        let deliveryDate = today.add(selectedOption.deliveryDays, 'days');
+        let dateString = deliveryDate.format('dddd, MMMM D');
+
 
         cartSummaryHTML += `
         <div class="cart-item-container">
             <div class="delivery-date">
-                Delivery date: Tuesday, June 21
+                Delivery date: ${dateString}
             </div>
 
             <div class="cart-item-details-grid">
                 <img class="product-image"
-                src="${matchingProduct.image}">
+                    src="${matchingProduct.image}">
 
                 <div class="cart-item-details">
-                <div class="product-name">
-                    ${matchingProduct.name}
-                </div>
-                <div class="product-price">
-                    $${formatCurrency(matchingProduct.priceCents)}
-                </div>
-                <div class="product-quantity">
-                    <span>
-                    Quantity: <span class="quantity-label">${cartItem.quantity}</span>
-                    </span>
-                    <span class="update-quantity-link link-primary">
-                    Update
-                    </span>
-                    <span class="delete-quantity-link link-primary js-delete-quantity"
-                                data-product-id="${matchingProduct.id}">
-                    Delete
-                    </span>
-                </div>
+                    <div class="product-name">
+                        ${matchingProduct.name}
+                    </div>
+                    <div class="product-price">
+                        $${formatCurrency(matchingProduct.priceCents)}
+                    </div>
+                    <div class="product-quantity">
+                        <span>
+                            Quantity: <span class="quantity-label">${cartItem.quantity}</span>
+                        </span>
+                        <span class="update-quantity-link link-primary">
+                            Update
+                        </span>
+                        <span class="delete-quantity-link link-primary js-delete-quantity"
+                            data-product-id="${matchingProduct.id}">
+                            Delete
+                        </span>
+                    </div>
                 </div>
 
                 <div class="delivery-options">
-                <div class="delivery-options-title">
-                    Choose a delivery option:
-                </div>
-                <div class="delivery-option">
-                    <input type="radio" checked
-                    class="delivery-option-input"
-                    name="delivery-option-${matchingProduct.id}">
-                    <div>
-                    <div class="delivery-option-date">
-                        Tuesday, June 21
+                    <div class="delivery-options-title">
+                        Choose a delivery option:
                     </div>
-                    <div class="delivery-option-price">
-                        FREE Shipping
-                    </div>
-                    </div>
-                </div>
-                <div class="delivery-option">
-                    <input type="radio"
-                    class="delivery-option-input"
-                    name="delivery-option-${matchingProduct.id}">
-                    <div>
-                    <div class="delivery-option-date">
-                        Wednesday, June 15
-                    </div>
-                    <div class="delivery-option-price">
-                        $4.99 - Shipping
-                    </div>
-                    </div>
-                </div>
-                <div class="delivery-option">
-                    <input type="radio"
-                    class="delivery-option-input"
-                    name="delivery-option-${matchingProduct.id}">
-                    <div>
-                    <div class="delivery-option-date">
-                        Monday, June 13
-                    </div>
-                    <div class="delivery-option-price">
-                        $9.99 - Shipping
-                    </div>
-                    </div>
-                </div>
+                    ${deliveryOptionsHTML(matchingProduct, cartItem)}
                 </div>
             </div>
-            </div>
+        </div>
         `;
     });
 
     document.querySelector('.js-order-summary').innerHTML = cartSummaryHTML;
 
-    /* this delete feature from cart is done entirely by me without any help , but it is
-    different from the supersimple.dev video that starts at time 13:32:46 */
+    // Add event listeners to delete buttons
     let deleteButtons = document.querySelectorAll('.js-delete-quantity');
-    for(let i=0 ; i<deleteButtons.length ; i++){
+    for (let i = 0; i < deleteButtons.length; i++) {
         deleteButtons[i].addEventListener('click', function () {
             const productId = deleteButtons[i].dataset.productId;
             deleteFromCart(productId);
             generateHTML();
         });
     }
+
+    // Add event listeners to delivery option radio buttons
+    let deliveryOptionButtons = document.querySelectorAll('.js-delivery-option');
+    for (let i = 0; i < deliveryOptionButtons.length; i++) {
+        deliveryOptionButtons[i].addEventListener('click', function () {
+            const productId = deliveryOptionButtons[i].dataset.productId;
+            const deliveryOptionId = deliveryOptionButtons[i].dataset.deliveryOptionId;
+            updateDeliveryOption(productId, deliveryOptionId);
+            saveToStorage();
+            generateHTML();
+        });
+    }
 }
 
+function deliveryOptionsHTML(matchingProduct, cartItem) {
+    let html = '';
 
-/* this delete feature from cart is done entirely by me without any help , but it is
-    different from the supersimple.dev video that starts at time 13:32:46 */
-function deleteFromCart(productId){
+    for (let i = 0; i < deliveryOptions.length; i++) {
+        const deliveryOption = deliveryOptions[i];
+        const today = dayjs();
+        const deliveryDate = today.add(deliveryOption.deliveryDays, 'days');
+        const dateString = deliveryDate.format('dddd, MMMM D');
+
+        const priceString = deliveryOption.priceCents === 0
+            ? 'FREE Shipping'
+            : `$${formatCurrency(deliveryOption.priceCents)} - Shipping`;
+
+        const isChecked = deliveryOption.id === cartItem.deliveryOptionId;
+
+        html += `
+        <div class="delivery-option js-delivery-option"
+            data-product-id="${matchingProduct.id}"
+            data-delivery-option-id="${deliveryOption.id}">
+            <input type="radio"
+                ${isChecked ? 'checked' : ''}
+                class="delivery-option-input"
+                name="delivery-option-${matchingProduct.id}">
+            <div>
+                <div class="delivery-option-date">
+                    ${dateString}
+                </div>
+                <div class="delivery-option-price">
+                    ${priceString}
+                </div>
+            </div>
+        </div>
+        `;
+    }
+
+    return html;
+}
+
+function deleteFromCart(productId) {
     let matchingProductIndex;
-    for(let i=0 ; i<cart.length ; i++){
-        if(cart[i].productId === productId)
+    for (let i = 0; i < cart.length; i++) {
+        if (cart[i].productId === productId) {
             matchingProductIndex = i;
+        }
     }
     cart.splice(matchingProductIndex, 1);
-    // Update localStorage after deletion
     saveToStorage();
-    localStorage.setItem('cart', JSON.stringify(cart));
-
 }
 
 generateHTML();
