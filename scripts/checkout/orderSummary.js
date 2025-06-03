@@ -1,35 +1,23 @@
 import { cart, saveToStorage, updateDeliveryOption } from '../../data/cart.js';
-import { products } from '../../data/products.js';
+import { products, getProduct} from '../../data/products.js';
 import { formatCurrency } from '../utils/money.js';
 import dayjs from 'https://unpkg.com/supersimpledev@8.5.0/dayjs/esm/index.js';
-import { deliveryOptions } from '../../data/deliveryOptions.js';
+import { deliveryOptions, getDeliveryOption } from '../../data/deliveryOptions.js';
 
-export function generateHTML() {
+export function renderOrderSummary() {
     let cartSummaryHTML = '';
 
     cart.forEach((cartItem) => {
         const productId = cartItem.productId;
 
-        let matchingProduct = null;
-        for (let i = 0; i < products.length; i++) {
-            if (productId === products[i].id) {
-                matchingProduct = products[i];
-            }
-        }
+        const matchingProduct = getProduct(productId);
 
-        let selectedOption = null;
-        for (let i = 0; i < deliveryOptions.length; i++) {
-            if (deliveryOptions[i].id === cartItem.deliveryOptionId) {
-                selectedOption = deliveryOptions[i];
-            }
-        }
+        const deliveryOptionId = cartItem.deliveryOptionId;
 
-        if (selectedOption === null) {
-            selectedOption = deliveryOptions[0];
-        }
+        let deliveryOption = getDeliveryOption(deliveryOptionId);
 
         let today = dayjs();
-        let deliveryDate = today.add(selectedOption.deliveryDays, 'days');
+        let deliveryDate = today.add(deliveryOption.deliveryDays, 'days');
         let dateString = deliveryDate.format('dddd, MMMM D');
 
 
@@ -83,7 +71,7 @@ export function generateHTML() {
         deleteButtons[i].addEventListener('click', function () {
             const productId = deleteButtons[i].dataset.productId;
             deleteFromCart(productId);
-            generateHTML();
+            renderOrderSummary();
         });
     }
 
@@ -95,7 +83,7 @@ export function generateHTML() {
             const deliveryOptionId = deliveryOptionButtons[i].dataset.deliveryOptionId;
             updateDeliveryOption(productId, deliveryOptionId);
             saveToStorage();
-            generateHTML();
+            renderOrderSummary();
         });
     }
 
