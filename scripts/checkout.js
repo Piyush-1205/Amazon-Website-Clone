@@ -146,7 +146,7 @@ function generateHTML() {
             }
         }
         cart.splice(matchingProductIndex, 1);
-        sav eToStorage();
+        saveToStorage();
     }
 }
 generateHTML();
