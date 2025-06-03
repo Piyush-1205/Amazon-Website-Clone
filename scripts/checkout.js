@@ -98,55 +98,55 @@ function generateHTML() {
             generateHTML();
         });
     }
-}
 
-function deliveryOptionsHTML(matchingProduct, cartItem) {
-    let html = '';
 
-    for (let i = 0; i < deliveryOptions.length; i++) {
-        const deliveryOption = deliveryOptions[i];
-        const today = dayjs();
-        const deliveryDate = today.add(deliveryOption.deliveryDays, 'days');
-        const dateString = deliveryDate.format('dddd, MMMM D');
+    function deliveryOptionsHTML(matchingProduct, cartItem) {
+        let html = '';
 
-        const priceString = deliveryOption.priceCents === 0
-            ? 'FREE Shipping'
-            : `$${formatCurrency(deliveryOption.priceCents)} - Shipping`;
+        for (let i = 0; i < deliveryOptions.length; i++) {
+            const deliveryOption = deliveryOptions[i];
+            const today = dayjs();
+            const deliveryDate = today.add(deliveryOption.deliveryDays, 'days');
+            const dateString = deliveryDate.format('dddd, MMMM D');
 
-        const isChecked = deliveryOption.id === cartItem.deliveryOptionId;
+            const priceString = deliveryOption.priceCents === 0
+                ? 'FREE Shipping'
+                : `$${formatCurrency(deliveryOption.priceCents)} - Shipping`;
 
-        html += `
-        <div class="delivery-option js-delivery-option"
-            data-product-id="${matchingProduct.id}"
-            data-delivery-option-id="${deliveryOption.id}">
-            <input type="radio"
-                ${isChecked ? 'checked' : ''}
-                class="delivery-option-input"
-                name="delivery-option-${matchingProduct.id}">
-            <div>
-                <div class="delivery-option-date">
-                    ${dateString}
-                </div>
-                <div class="delivery-option-price">
-                    ${priceString}
+            const isChecked = deliveryOption.id === cartItem.deliveryOptionId;
+
+            html += `
+            <div class="delivery-option js-delivery-option"
+                data-product-id="${matchingProduct.id}"
+                data-delivery-option-id="${deliveryOption.id}">
+                <input type="radio"
+                    ${isChecked ? 'checked' : ''}
+                    class="delivery-option-input"
+                    name="delivery-option-${matchingProduct.id}">
+                <div>
+                    <div class="delivery-option-date">
+                        ${dateString}
+                    </div>
+                    <div class="delivery-option-price">
+                        ${priceString}
+                    </div>
                 </div>
             </div>
-        </div>
-        `;
-    }
-
-    return html;
-}
-
-function deleteFromCart(productId) {
-    let matchingProductIndex;
-    for (let i = 0; i < cart.length; i++) {
-        if (cart[i].productId === productId) {
-            matchingProductIndex = i;
+            `;
         }
-    }
-    cart.splice(matchingProductIndex, 1);
-    saveToStorage();
-}
 
+        return html;
+    }
+
+    function deleteFromCart(productId) {
+        let matchingProductIndex;
+        for (let i = 0; i < cart.length; i++) {
+            if (cart[i].productId === productId) {
+                matchingProductIndex = i;
+            }
+        }
+        cart.splice(matchingProductIndex, 1);
+        sav eToStorage();
+    }
+}
 generateHTML();
