@@ -137,7 +137,6 @@ export function renderOrderSummary() {
             }
         }
         cart.splice(matchingProductIndex, 1);
-
         saveToStorage();
     }
 }
