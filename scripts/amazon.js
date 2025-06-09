@@ -18,14 +18,14 @@ for(let i=0 ; i< products.length ; i++){
 
           <div class="product-rating-container">
             <img class="product-rating-stars"
-              src="images/ratings/rating-${products[i].rating.stars}.png">
+              src="${products[i].getStarsUrl()}">
             <div class="product-rating-count link-primary">
                 ${products[i].rating.count}
             </div>
           </div>
 
           <div class="product-price">
-            $${formatCurrency(products[i].priceCents)}
+            ${products[i].getPrice()}
           </div>
 
           <div class="product-quantity-container">
